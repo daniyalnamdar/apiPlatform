@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
@@ -22,7 +23,7 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
  * @ApiResource(
  *     collectionOperations={
  *          "get"={"security"="is_granted('ROLE_USER')"},
- *          "post"
+ *          "post"={"validation_groups"={"Default", "create"} }
  *     },
  *     itemOperations={
  *          "get"={"security"="is_granted('ROLE_USER')"},
@@ -61,7 +62,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
-     * @Groups({"user:write"})
      */
     private $password;
 
@@ -82,6 +82,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @Groups("user:write")
+     * @SerializedName("password")
+     * @Assert\NotBlank(groups={"create"})
      */
     private $plainPassword;
 
@@ -187,7 +189,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        $this->plainPassword = null;
     }
 
     public function setUsername(string $username): self
