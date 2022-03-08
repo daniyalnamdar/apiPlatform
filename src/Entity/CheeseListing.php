@@ -27,8 +27,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     itemOperations={
  *          "get"={
  *              "normalization_context"={"groups"={"cheese_listing:read", "cheese_listing:item:get"}}},
- *      "put"={"access_control"="is_granted('ROLE_USER')"},
- *      "delete"={"access_control"="is_granted('ROLE_ADMIN')"}
+ *      "put"={"security"="is_granted('EDIT', object)",
+ *     "security_message"="Only the creator can edit a cheese listing"
+ *     },
+ *      "delete"={"security"="is_granted('ROLE_ADMIN')"}
  * },
  *     shortName="cheeses",
  *     normalizationContext={"groups"={"cheese_listing:read"}, "swagger_definition_name"="Read"},

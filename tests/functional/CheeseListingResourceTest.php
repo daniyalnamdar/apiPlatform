@@ -3,12 +3,12 @@
 namespace App\Tests\functional;
 
 
-use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
-use App\Entity\User;
+use App\Entity\CheeseListing;
+use App\Test\CustomApiTestCase;
 use Hautelook\AliceBundle\PhpUnit\ReloadDatabaseTrait;
 
 
-class CheeseListingResourceTest extends ApiTestCase
+class CheeseListingResourceTest extends CustomApiTestCase
 {
     use ReloadDatabaseTrait;
     public function testCreateCheeseListing()
@@ -20,22 +20,42 @@ class CheeseListingResourceTest extends ApiTestCase
         $client->request('POST', '/api/cheeses');
         $this->assertResponseStatusCodeSame(401);
 
-        $user = new User();
-        $user->setEmail('cheeseplease@example.com');
-        $user->setUsername('cheeseplease');
-        $user->setPassword('$2y$13$Da7nL4GBqavL3hwT5q5u4uOquDrZzTwgDCIT43TXdU3hwH3.I5HKW')
-        ;
-        $em = self::$container->get('doctrine')->getManager();
-        $em->persist($user);
+//        $this->createUser('cheeseplease@example.com', '$2y$13$Da7nL4GBqavL3hwT5q5u4uOquDrZzTwgDCIT43TXdU3hwH3.I5HKW');
+//        $this->logIn($client, 'cheeseplease@example.com', 'foo');
+        $this->createUserAndLogIn($client, 'cheeseplease@example.com', 'foo');
+
+//        $client->request('POST', '/api/cheeses');
+//        $this->assertResponseStatusCodeSame(400);
+    }
+
+    public function testUpdateCheeseListing()
+    {
+        $client = self::createClient();
+        $user1 = $this->createUser('user1@example.com', '$2y$13$Da7nL4GBqavL3hwT5q5u4uOquDrZzTwgDCIT43TXdU3hwH3.I5HKW');
+        $user2 = $this->createUser('user2@example.com', '$2y$13$Da7nL4GBqavL3hwT5q5u4uOquDrZzTwgDCIT43TXdU3hwH3.I5HKW');
+        $cheeseListing = new CheeseListing();
+        $cheeseListing->setTitle('Block of cheddar');
+        $cheeseListing->setOwner($user1);
+        $cheeseListing->setPrice(1000);
+        $cheeseListing->setDescription('mmmm');
+
+        $em = $this->getEntityManager();
+        $em->persist($cheeseListing);
         $em->flush();
 
-        $client->request('POST', '/login', [
-            'headers' => ['Content-Type' => 'application/json'],
-            'json' => [
-                'email' => 'cheeseplease@example.com',
-                'password' => 'foo'
-            ],
+        $this->logIn($client, 'user2@example.com', 'foo');
+        $client->request('PUT', '/api/cheeses/'.$cheeseListing->getId(), [
+            'json' => ['title' => 'updated']
         ]);
-        $this->assertResponseStatusCodeSame(204);
+
+        $this->assertResponseStatusCodeSame(403, 'only author can updated');
+
+        $this->logIn($client, 'user1@example.com', 'foo');
+        $client->request('PUT', '/api/cheeses/'.$cheeseListing->getId(), [
+            'json' => ['title' => 'updated']
+        ]);
+        $this->assertResponseStatusCodeSame(200);
     }
+
+
 }

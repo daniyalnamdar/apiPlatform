@@ -20,14 +20,16 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
 
 /**
  * @ApiResource(
+ *     collectionOperations={
+ *          "get"={"security"="is_granted('ROLE_USER')"},
+ *          "post"
+ *     },
  *     itemOperations={
- *          "get"={
- *              "normalization_context"={"groups"={"user:read", "user:item:get"}}}, "put", "patch", "delete"},
-
- *     normalizationContext={"groups"={"user:read"}},
- *     denormalizationContext={"groups"={"user:write"}},
- * )
- *
+ *          "get"={"security"="is_granted('ROLE_USER')"},
+ *          "put"={"security"="is_granted('ROLE_USER') and object == user"},
+ *          "delete"={"security"="is_granted('ROLE_ADMIN')"}
+ *     }
+ *)
  * @UniqueEntity(fields={"username"})
  * @UniqueEntity(fields={"email"})
  *
@@ -78,6 +80,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $cheeseListings;
 
+    /**
+     * @Groups("user:write")
+     */
+    private $plainPassword;
+
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword($plainPassword): self
+    {
+        $this->plainPassword = $plainPassword;
+        return $this;
+    }
     public function __construct()
     {
         $this->cheeseListings = new ArrayCollection();
