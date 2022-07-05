@@ -18,7 +18,6 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 
 
-
 /**
  * @ApiResource(
  *     collectionOperations={
@@ -28,8 +27,10 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
  *     itemOperations={
  *          "get"={"security"="is_granted('ROLE_USER')"},
  *          "put"={"security"="is_granted('ROLE_USER') and object == user"},
- *          "delete"={"security"="is_granted('ROLE_ADMIN')"}
- *     }
+ *          "delete"={"security"="is_granted('ROLE_ADMIN')"},
+ *     },
+ *     normalizationContext={"groups"={"user:read"}},
+ *     denormalizationContext={"groups"={"user:write"}}
  *)
  * @UniqueEntity(fields={"username"})
  * @UniqueEntity(fields={"email"})
@@ -39,6 +40,7 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -56,6 +58,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="json")
+     * @Groups({"user:write"})
      */
     private $roles = [];
 
@@ -86,6 +89,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @Assert\NotBlank(groups={"create"})
      */
     private $plainPassword;
+
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     * @Groups({"admin:read", "user:write"})
+     */
+    private $phoneNumber;
 
 
     public function getPlainPassword(): ?string
@@ -225,6 +234,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $cheeseListing->setOwner(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPhoneNumber(): ?string
+    {
+        return $this->phoneNumber;
+    }
+
+    public function setPhoneNumber(?string $phoneNumber): self
+    {
+        $this->phoneNumber = $phoneNumber;
 
         return $this;
     }

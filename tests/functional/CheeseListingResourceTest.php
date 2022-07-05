@@ -11,6 +11,7 @@ use Hautelook\AliceBundle\PhpUnit\ReloadDatabaseTrait;
 class CheeseListingResourceTest extends CustomApiTestCase
 {
     use ReloadDatabaseTrait;
+
     public function testCreateCheeseListing()
     {
         $client = self::createClient();

@@ -40,7 +40,7 @@ class CustomApiTestCase extends ApiTestCase
 
     protected function createUserAndLogIn(Client $client, string $email, string $password): User
     {
-        $user = $this->createUser($email, '$2y$13$1jtwBNxC2/UEfprTms36/OvFM0MFoh.CZ8i0vcYUCqmnyYAH/OT9a');
+        $user = $this->createUser($email, '$2y$13$DWvpixyROCBkR.7OsfBrSe4CQu3h46JvEauge6P8XD/XjMDwtdfoS');
         $this->logIn($client, $email, $password);
         return $user;
     }
