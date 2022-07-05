@@ -99,6 +99,7 @@ class CheeseListing
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"cheese_listing:write"})
      */
     private $isPublished = false;
 
