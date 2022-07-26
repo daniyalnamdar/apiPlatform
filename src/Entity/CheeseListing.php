@@ -8,7 +8,20 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CheeseListingRepository::class)]
-#[ApiResource]
+#[
+    ApiResource(
+        collectionOperations: ['get', 'post'],
+        itemOperations: [
+            'get'=>[
+                'path'=>'i❤️cheeses/{id}'
+            ],
+            'put',
+            'delete'],
+        shortName: 'cheeses'
+
+    )
+
+]
 class CheeseListing
 {
     #[ORM\Id]
