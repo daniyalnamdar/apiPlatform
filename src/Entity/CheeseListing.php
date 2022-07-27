@@ -19,11 +19,14 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 #[ORM\Entity(repositoryClass: CheeseListingRepository::class)]
 #[
     ApiResource(
+
         collectionOperations: ['get', 'post'],
         itemOperations: ['get', 'put', 'delete'],
         shortName: 'cheeses',
+        attributes: ['pagination_items_per_page'=> 7],
         denormalizationContext: ['groups'=>'cheese_listing:write'],
-        normalizationContext: ['groups'=>'cheese_listing:read'],
+        formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
+        normalizationContext: ['groups'=>'cheese_listing:read']
 
     )
 
