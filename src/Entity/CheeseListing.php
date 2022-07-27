@@ -15,6 +15,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CheeseListingRepository::class)]
 #[
@@ -55,15 +56,23 @@ class CheeseListing
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        maxMessage: 'Describe Your cheese in 50 char or less'
+    )]
     #[Groups(['cheese_listing:read', 'cheese_listing:write'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank]
     #[Groups(['cheese_listing:read'])]
     private ?string $description = null;
 
     #[ORM\Column]
     #[Groups(['cheese_listing:read', 'cheese_listing:write'])]
+    #[Assert\NotBlank]
     private ?int $price = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
