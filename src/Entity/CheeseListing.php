@@ -2,7 +2,13 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use App\Repository\CheeseListingRepository;
 use Carbon\Carbon;
 use Doctrine\DBAL\Types\Types;
@@ -22,6 +28,22 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
     )
 
 ]
+#[ApiFilter(
+    BooleanFilter::class,
+    properties: ['isPublished']
+)]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'title' => SearchFilterInterface::STRATEGY_PARTIAL,
+        'description' => SearchFilterInterface::STRATEGY_EXACT
+    ]
+)]
+#[ApiFilter(
+    RangeFilter::class,
+    properties: ['price']
+)]
+#[ApiFilter(PropertyFilter::class)]
 class CheeseListing
 {
     #[ORM\Id]
@@ -67,6 +89,15 @@ class CheeseListing
     public function getDescription(): ?string
     {
         return $this->description;
+    }
+
+    #[Groups(['cheese_listing:read'])]
+    public function getShortDescription(): ?string
+    {
+        if (strlen($this->description) < 40){
+            return $this->description;
+        }
+        return substr($this->description, 0, 40).'...';
     }
 
     public function setDescription(string $description): self
