@@ -22,7 +22,11 @@ use Symfony\Component\Validator\Constraints as Assert;
     ApiResource(
 
         collectionOperations: ['get', 'post'],
-        itemOperations: ['get', 'put', 'delete'],
+        itemOperations: [
+            'get' => [
+                'normalization_context' => ['groups' => ['cheese_listing:read', 'cheese_listing:item:get']]
+                ],
+            'put', 'delete'],
         shortName: 'cheeses',
         attributes: ['pagination_items_per_page'=> 7],
         denormalizationContext: ['groups'=>'cheese_listing:write'],
@@ -62,7 +66,7 @@ class CheeseListing
         max: 50,
         maxMessage: 'Describe Your cheese in 50 char or less'
     )]
-    #[Groups(['cheese_listing:read', 'cheese_listing:write'])]
+    #[Groups(['cheese_listing:read', 'cheese_listing:write', 'user:read'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
@@ -71,7 +75,7 @@ class CheeseListing
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['cheese_listing:read', 'cheese_listing:write'])]
+    #[Groups(['cheese_listing:read', 'cheese_listing:write', 'user:read'])]
     #[Assert\NotBlank]
     private ?int $price = null;
 
@@ -84,6 +88,7 @@ class CheeseListing
 
     #[ORM\ManyToOne(inversedBy: 'cheeseListings')]
     #[Groups(['cheese_listing:read', 'cheese_listing:write'])]
+    #[Assert\Valid]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
 
