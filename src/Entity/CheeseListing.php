@@ -66,7 +66,7 @@ class CheeseListing
         max: 50,
         maxMessage: 'Describe Your cheese in 50 char or less'
     )]
-    #[Groups(['cheese_listing:read', 'cheese_listing:write', 'user:read'])]
+    #[Groups(['cheese_listing:read', 'cheese_listing:write', 'user:read', 'user:write'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
@@ -75,7 +75,7 @@ class CheeseListing
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['cheese_listing:read', 'cheese_listing:write', 'user:read'])]
+    #[Groups(['cheese_listing:read', 'cheese_listing:write', 'user:read', 'user:write'])]
     #[Assert\NotBlank]
     private ?int $price = null;
 
@@ -129,7 +129,7 @@ class CheeseListing
     }
 
     #[SerializedName('description')]
-    #[Groups(['cheese_listing:write'])]
+    #[Groups(['cheese_listing:write', 'user:write'])]
     public function setTextDescription(string $description): self
     {
         $this->description =nl2br($description);
