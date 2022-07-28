@@ -44,7 +44,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     SearchFilter::class,
     properties: [
         'title' => SearchFilterInterface::STRATEGY_PARTIAL,
-        'description' => SearchFilterInterface::STRATEGY_EXACT
+        'description' => SearchFilterInterface::STRATEGY_EXACT,
+        'owner' => SearchFilterInterface::STRATEGY_EXACT,
+        'owner.username' => SearchFilterInterface::STRATEGY_PARTIAL
     ]
 )]
 #[ApiFilter(
