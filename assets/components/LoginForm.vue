@@ -45,11 +45,11 @@ export default {
             password: this.password
           })
           .then(response => {
-            console.log(response.data);
+            console.log(response.headers);
 
-            // this.$emit('user-authenticated', response.headers.location);
-            // this.email = '';
-            // this.password = '';
+            this.$emit('user-authenticated', response.headers.location);
+            this.email = '';
+            this.password = '';
           }).catch(error => {
         if (error.response.data.error) {
           this.error = error.response.data.error
