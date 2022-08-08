@@ -17,6 +17,8 @@ Please make sure that you have the following files on your local \
 ***base.html.twig*** \
 ***homepage.html.twig*** \
 ***FrontendController.php*** \
+
+
 Besides, run the following command 
 ```
 composer require encore
@@ -33,4 +35,8 @@ yarn install
 ```
 yarn encore dev --watch
 ```
-
+If you are facing The **Error: error:0308010C:digital envelope routines::unsupported**
+you can either downgrade Node.JS to long term support version 16.14.0 or run the following command
+```
+export NODE_OPTIONS=--openssl-legacy-provider
+```
