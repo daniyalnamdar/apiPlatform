@@ -28,7 +28,10 @@ use Symfony\Component\Validator\Constraints as Assert;
             'get' => [
                 'normalization_context' => ['groups' => ['cheese_listing:read', 'cheese_listing:item:get']]
             ],
-            'put' => ["security" => "is_granted('ROLE_USER')"],
+            'put' => [
+                "security" => "is_granted('ROLE_USER') and object.getOwner() == user",
+                "security_message" => "Only the creator can edit a cheese listing"
+                ],
             'delete' => ["security" => "is_granted('ROLE_ADMIN')"]
         ],
         shortName: 'cheeses',
@@ -73,7 +76,7 @@ class CheeseListing
         maxMessage: 'Describe Your cheese in 50 char or less'
     )]
     #[Groups(['cheese_listing:read', 'cheese_listing:write', 'user:read', 'user:write'])]
-    private ?string $title = null;
+    private ?string $title;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank]
@@ -112,6 +115,11 @@ class CheeseListing
     public function getTitle(): ?string
     {
         return $this->title;
+    }
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+        return $this;
     }
 
     public function getDescription(): ?string
