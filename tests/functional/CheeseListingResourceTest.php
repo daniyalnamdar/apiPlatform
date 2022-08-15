@@ -2,14 +2,12 @@
 
 namespace App\Tests\functional;
 
-use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
-use App\Entity\User;
+use App\Test\CustomApiTestCase;
 use Hautelook\AliceBundle\PhpUnit\ReloadDatabaseTrait;
 
-class CheeseListingResourceTest extends ApiTestCase
+
+class CheeseListingResourceTest extends CustomApiTestCase
 {
-    protected $preserveGlobalState = FALSE;
-    protected $runTestInSeparateProcess = TRUE;
 
     use ReloadDatabaseTrait;
 
@@ -20,26 +18,12 @@ class CheeseListingResourceTest extends ApiTestCase
         $client->request('POST', '/api/cheeses');
         $this->assertResponseStatusCodeSame(401);
 
-        $user = new User();
-        $user->setEmail('test1@gmail.com');
-        $user->setUsername('test1');
-        // pass is 123
-        $user->setPassword('$2y$13$GWLyL0MVuoJSBomtusQpP.MhebEB3to4zlvjoNDvNQUBCpCTPvrCe');
+        $this->createUserAndLogIn($client,'test@gmail.com', '123');
 
-
-
-        $em = $client->getContainer()->get('doctrine')->getManager();
-        $em->persist($user);
-        $em->flush();
-
-        $client->request('POST', '/login', [
-            'json' => [
-                'email' => 'test1@gmail.com',
-                'password' => '123',
-            ]
+        $client->request('POST', '/api/cheeses',[
+            'json' => [],
         ]);
-        $this->assertResponseStatusCodeSame(204);
-
+        $this->assertResponseStatusCodeSame(422);
     }
 
 
