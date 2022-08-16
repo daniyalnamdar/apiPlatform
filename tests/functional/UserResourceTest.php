@@ -21,5 +21,20 @@ class UserResourceTest extends CustomApiTestCase
         $this->assertResponseStatusCodeSame(201);
         $this->logIn($client, 'example1@gmail.com', 'foo');
     }
+    public function testUpdateUser()
+    {
+        $client = self::createClient();
+        $user = $this->createUserAndLogIn($client, 'example@gmail.com', 'foo');
+
+        $client->request('PUT', '/api/users/'.$user->getId(), [
+            'json' => [
+                'username' => 'newusername'
+            ]
+        ]);
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            'username' => 'newusername'
+        ]);
+    }
 
 }
