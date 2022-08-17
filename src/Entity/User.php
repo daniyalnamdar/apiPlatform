@@ -52,6 +52,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email;
 
     #[ORM\Column]
+    #[Groups(['user:write'])]
     private array $roles = [];
 
     /**
@@ -74,6 +75,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read', 'user:write'])]
     #[Assert\Valid]
     private Collection $cheeseListings;
+
+
+    #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['admin:read', 'user:write'])]
+    private ?string $phoneNumber = null;
 
     public function __construct()
     {
@@ -201,6 +207,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPlainPassword(?string $plainPassword): self
     {
         $this->plainPassword = $plainPassword;
+        return $this;
+    }
+
+    public function getPhoneNumber(): ?string
+    {
+        return $this->phoneNumber;
+    }
+
+    public function setPhoneNumber(?string $phoneNumber): self
+    {
+        $this->phoneNumber = $phoneNumber;
+
         return $this;
     }
 
