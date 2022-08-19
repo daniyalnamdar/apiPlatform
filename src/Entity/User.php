@@ -31,9 +31,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         'put' => ["security" => "is_granted('ROLE_USER') and object == user"],
         'delete' => ["security" => "is_granted('ROLE_ADMIN')"]
         ],
-    attributes: ["security" => "is_granted('ROLE_USER')"],
-    denormalizationContext: ['groups'=>'user:write'],
-    normalizationContext: ['groups'=>'user:read']
+    attributes: ["security" => "is_granted('ROLE_USER')"]
 )]
 #[ApiFilter(PropertyFilter::class)]
 #[UniqueEntity('username')]

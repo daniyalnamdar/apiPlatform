@@ -25,9 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             'post' => ["security" => "is_granted('ROLE_USER')"]
         ],
         itemOperations: [
-            'get' => [
-                'normalization_context' => ['groups' => ['cheese_listing:read', 'cheese_listing:item:get']]
-            ],
+            'get',
             'put' => [
                 "security" => "is_granted('EDIT', 'previous_object')",
                 "security_message" => "Only the creator can edit a cheese listing"
@@ -36,9 +34,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ],
         shortName: 'cheeses',
         attributes: ['pagination_items_per_page'=> 7],
-        denormalizationContext: ['groups'=>'cheese_listing:write'],
-        formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
-        normalizationContext: ['groups'=>'cheese_listing:read']
+        formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']]
 
     )
 
