@@ -32,7 +32,7 @@ use Symfony\Component\Validator\Constraints as Assert;
                 ],
             'delete' => ["security" => "is_granted('ROLE_ADMIN')"]
         ],
-        shortName: 'cheeses',
+        shortName: 'cheese',
         attributes: ['pagination_items_per_page'=> 7],
         formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']]
 
@@ -71,16 +71,16 @@ class CheeseListing
         max: 50,
         maxMessage: 'Describe Your cheese in 50 char or less'
     )]
-    #[Groups(['cheese_listing:read', 'cheese_listing:write', 'user:read', 'user:write'])]
+    #[Groups(['cheese:read', 'cheese:write', 'user:read', 'user:write'])]
     private ?string $title;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank]
-    #[Groups(['cheese_listing:read'])]
+    #[Groups(['cheese:read'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['cheese_listing:read', 'cheese_listing:write', 'user:read', 'user:write'])]
+    #[Groups(['cheese:read', 'cheese:write', 'user:read', 'user:write'])]
     #[Assert\NotBlank]
     private ?int $price = null;
 
@@ -88,11 +88,11 @@ class CheeseListing
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column]
-    #[Groups(['cheese_listing:read'])]
+    #[Groups(['cheese:read'])]
     private ?bool $isPublished = false;
 
     #[ORM\ManyToOne(inversedBy: 'cheeseListings')]
-    #[Groups(['cheese_listing:read', 'cheese_listing:write'])]
+    #[Groups(['cheese:read', 'cheese:write'])]
     #[Assert\Valid]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
@@ -123,7 +123,7 @@ class CheeseListing
         return $this->description;
     }
 
-    #[Groups(['cheese_listing:read'])]
+    #[Groups(['cheese:read'])]
     public function getShortDescription(): ?string
     {
         if (strlen($this->description) < 40){
@@ -139,7 +139,7 @@ class CheeseListing
     }
 
     #[SerializedName('description')]
-    #[Groups(['cheese_listing:write', 'user:write'])]
+    #[Groups(['cheese:write', 'user:write'])]
     public function setTextDescription(string $description): self
     {
         $this->description =nl2br($description);
@@ -164,7 +164,7 @@ class CheeseListing
         return $this->createdAt;
     }
 
-    #[Groups(['cheese_listing:read'])]
+    #[Groups(['cheese:read'])]
     public function getCreatedAtAgo(): string
     {
         return Carbon::instance($this->getCreatedAt())->diffForHumans();
