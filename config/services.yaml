@@ -24,7 +24,7 @@ services:
     # please note that last definitions always *replace* previous ones
     App\Serializer\AdminGroupsContextBuilder:
         decorates: 'api_platform.serializer.context_builder'
-        arguments: [ '@App\Serializer\AdminGroupsContextBuilder.inner' ]
+        arguments: ['@App\Serializer\AdminGroupsContextBuilder.inner']
 
     App\ApiPlatform\AutoGroupResourceMetadataFactory:
         decorates: 'api_platform.metadata.resource.metadata_factory'
@@ -32,5 +32,4 @@ services:
         # our service is never cached (which, of course, can have performance
         # implications!
         decoration_priority: -20
-        arguments: [ '@App\ApiPlatform\AutoGroupResourceMetadataFactory.inner' ]
-]
+        arguments: ['@App\ApiPlatform\AutoGroupResourceMetadataFactory.inner']
