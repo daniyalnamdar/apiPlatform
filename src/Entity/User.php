@@ -52,7 +52,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email;
 
     #[ORM\Column]
-    #[Groups(['user:write'])]
+    #[Groups(['admin:write'])]
     private array $roles = [];
 
     /**

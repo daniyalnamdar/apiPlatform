@@ -5,6 +5,7 @@ namespace App\Tests\functional;
 use App\Entity\User;
 use App\Test\CustomApiTestCase;
 use Hautelook\AliceBundle\PhpUnit\ReloadDatabaseTrait;
+use phpDocumentor\Reflection\Types\String_;
 
 class UserResourceTest extends CustomApiTestCase
 {
@@ -29,13 +30,18 @@ class UserResourceTest extends CustomApiTestCase
 
         $client->request('PUT', '/api/users/'.$user->getId(), [
             'json' => [
-                'username' => 'newusername'
+                'username' => 'newusername',
+                'roles' => ['ROLE_ADMIN']
             ]
         ]);
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains([
             'username' => 'newusername'
         ]);
+        $em = $this->getEntityManager();
+        /** @var User $user */
+        $user = $em->getRepository(User::class)->find($user->getId());
+        $this->assertEquals(['ROLE_USER'], $user->getRoles());
     }
 
     public function testGetUser()
@@ -62,8 +68,9 @@ class UserResourceTest extends CustomApiTestCase
         $this->logIn($client, 'example@gmail.com', 'foo');
 
         $client->request('GET', '/api/users/'.$user->getId());
+
         $this->assertJsonContains([
-            'phoneNumber' => '555.123.4567'
+               'phoneNumber' => '555.123.4567'
         ]);
 
 
