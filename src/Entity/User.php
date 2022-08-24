@@ -66,7 +66,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, unique: true)]
     #[Assert\NotBlank]
-    #[Groups(['user:read', 'user:write', 'cheese:item:get', 'cheese:write'])]
+    #[Groups(['user:read', 'user:write', 'cheese:item:get'])]
     private ?string $username = null;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: CheeseListing::class, cascade: ['Persist'], orphanRemoval: true)]

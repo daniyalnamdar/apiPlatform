@@ -15,16 +15,33 @@ class CheeseListingResourceTest extends CustomApiTestCase
     public function testCreateCheeseListing()
     {
         $client = self::createClient();
-
-        $client->request('POST', '/api/cheeses');
-        $this->assertResponseStatusCodeSame(401);
-
-        $this->createUserAndLogIn($client,'test@gmail.com', '123');
-
-        $client->request('POST', '/api/cheeses',[
+        $client->request('POST', '/api/cheeses', [
             'json' => [],
         ]);
-        $this->assertResponseStatusCodeSame(422);
+        $this->assertResponseStatusCodeSame(401);
+
+        $authenticatedUser = $this->createUserAndLogIn($client, 'cheeseplease@example.com', 'foo');
+        $otherUser = $this->createUser('otheruser@example.com', 'foo');
+        $cheesyData = [
+            'title' => 'Mystery cheese... kinda green',
+            'description' => 'What mysteries does it hold?',
+            'price' => 5000
+        ];
+        $client->request('POST', '/api/cheeses', [
+            'json' => $cheesyData,
+        ]);
+        $this->assertResponseStatusCodeSame(422, 'missing owner');
+
+        $client->request('POST', '/api/cheeses', [
+            'json' => $cheesyData + ['owner' => '/api/users/'.$otherUser->getId()],
+        ]);
+        $this->assertResponseStatusCodeSame(422, 'not passing the correct owner');
+
+        $client->request('POST', '/api/cheeses', [
+            'json' => $cheesyData + ['owner' => '/api/users/'.$authenticatedUser->getId()],
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
     }
 
     public function testUpdateCheeseListing()

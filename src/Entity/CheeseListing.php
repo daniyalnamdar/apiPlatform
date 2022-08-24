@@ -10,6 +10,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use App\Repository\CheeseListingRepository;
+use App\Validator\IsValidOwner;
 use Carbon\Carbon;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -76,7 +77,7 @@ class CheeseListing
 
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank]
-    #[Groups(['cheese:read'])]
+    #[Groups(['cheese:read', 'cheese:write'])]
     private ?string $description = null;
 
     #[ORM\Column]
@@ -92,8 +93,9 @@ class CheeseListing
     private ?bool $isPublished = false;
 
     #[ORM\ManyToOne(inversedBy: 'cheeseListings')]
-    #[Groups(['cheese:read', 'cheese:write'])]
-    #[Assert\Valid]
+    #[Groups(['cheese:read', 'cheese:collection:post'])]
+    #[Assert\NotBlank]
+    #[IsValidOwner]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
 
