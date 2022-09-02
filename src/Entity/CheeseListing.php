@@ -9,6 +9,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
+use App\Doctrine\CheeseListingSetOwnerListener;
 use App\Repository\CheeseListingRepository;
 use App\Validator\IsValidOwner;
 use Carbon\Carbon;
@@ -18,6 +19,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 
+
+#[ORM\EntityListeners([CheeseListingSetOwnerListener::class])]
 #[ORM\Entity(repositoryClass: CheeseListingRepository::class)]
 #[
     ApiResource(
@@ -94,7 +97,6 @@ class CheeseListing
 
     #[ORM\ManyToOne(inversedBy: 'cheeseListings')]
     #[Groups(['cheese:read', 'cheese:collection:post'])]
-    #[Assert\NotBlank]
     #[IsValidOwner]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
