@@ -174,7 +174,7 @@ class CheeseListing
         return Carbon::instance($this->getCreatedAt())->diffForHumans();
     }
 
-    public function isIsPublished(): ?bool
+    public function getIsPublished(): ?bool
     {
         return $this->isPublished;
     }

@@ -220,4 +220,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    #[Groups(['user:read'])]
+    #[SerializedName('cheeseListings')]
+    public function getPublishedCheeseListings(): Collection
+    {
+        return $this->cheeseListings->filter(function(CheeseListing $cheeseListing) {
+            return $cheeseListing->getIsPublished();
+        });
+    }
+
 }
