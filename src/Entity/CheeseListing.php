@@ -9,7 +9,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
+use App\Doctrine\CheeseListingSetOwnerListener;
 use App\Repository\CheeseListingRepository;
+use App\Validator\IsValidOwner;
 use Carbon\Carbon;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -17,21 +19,26 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 
+
+#[ORM\EntityListeners([CheeseListingSetOwnerListener::class])]
 #[ORM\Entity(repositoryClass: CheeseListingRepository::class)]
 #[
     ApiResource(
 
-        collectionOperations: ['get', 'post'],
+        collectionOperations: ['get',
+            'post' => ["security" => "is_granted('ROLE_USER')"]
+        ],
         itemOperations: [
-            'get' => [
-                'normalization_context' => ['groups' => ['cheese_listing:read', 'cheese_listing:item:get']]
+            'get',
+            'put' => [
+                "security" => "is_granted('EDIT', 'previous_object')",
+                "security_message" => "Only the creator can edit a cheese listing"
                 ],
-            'put', 'delete'],
-        shortName: 'cheeses',
+            'delete' => ["security" => "is_granted('ROLE_ADMIN')"]
+        ],
+        shortName: 'cheese',
         attributes: ['pagination_items_per_page'=> 7],
-        denormalizationContext: ['groups'=>'cheese_listing:write'],
-        formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
-        normalizationContext: ['groups'=>'cheese_listing:read']
+        formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']]
 
     )
 
@@ -68,16 +75,16 @@ class CheeseListing
         max: 50,
         maxMessage: 'Describe Your cheese in 50 char or less'
     )]
-    #[Groups(['cheese_listing:read', 'cheese_listing:write', 'user:read', 'user:write'])]
-    private ?string $title = null;
+    #[Groups(['cheese:read', 'cheese:write', 'user:read', 'user:write'])]
+    private ?string $title;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank]
-    #[Groups(['cheese_listing:read'])]
+    #[Groups(['cheese:read', 'cheese:write'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['cheese_listing:read', 'cheese_listing:write', 'user:read', 'user:write'])]
+    #[Groups(['cheese:read', 'cheese:write', 'user:read', 'user:write'])]
     #[Assert\NotBlank]
     private ?int $price = null;
 
@@ -85,12 +92,12 @@ class CheeseListing
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column]
-    #[Groups(['cheese_listing:read'])]
+    #[Groups(['cheese:read'])]
     private ?bool $isPublished = false;
 
     #[ORM\ManyToOne(inversedBy: 'cheeseListings')]
-    #[Groups(['cheese_listing:read', 'cheese_listing:write'])]
-    #[Assert\Valid]
+    #[Groups(['cheese:read', 'cheese:collection:post'])]
+    #[IsValidOwner]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
 
@@ -109,13 +116,18 @@ class CheeseListing
     {
         return $this->title;
     }
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+        return $this;
+    }
 
     public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    #[Groups(['cheese_listing:read'])]
+    #[Groups(['cheese:read'])]
     public function getShortDescription(): ?string
     {
         if (strlen($this->description) < 40){
@@ -131,7 +143,7 @@ class CheeseListing
     }
 
     #[SerializedName('description')]
-    #[Groups(['cheese_listing:write', 'user:write'])]
+    #[Groups(['cheese:write', 'user:write'])]
     public function setTextDescription(string $description): self
     {
         $this->description =nl2br($description);
@@ -156,13 +168,13 @@ class CheeseListing
         return $this->createdAt;
     }
 
-    #[Groups(['cheese_listing:read'])]
+    #[Groups(['cheese:read'])]
     public function getCreatedAtAgo(): string
     {
         return Carbon::instance($this->getCreatedAt())->diffForHumans();
     }
 
-    public function isIsPublished(): ?bool
+    public function getIsPublished(): ?bool
     {
         return $this->isPublished;
     }
